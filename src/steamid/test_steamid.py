@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, AsyncMock
 from .steamid import SteamID, SteamIDType
 
 
@@ -71,6 +72,26 @@ class TestToSteamID64(unittest.IsolatedAsyncioTestCase):
         expected_steam_id_64 = "76561197960287930"
         steam_id = SteamID(steam_id_string)
         steam_id_64 = await steam_id.to_steam_id_64()
+        self.assertEqual(expected_steam_id_64, steam_id_64)
+
+    @patch("steamid.steamid.resolve_custom_id")
+    async def test_custom_url(self, mocked_resolve_custom_id: AsyncMock):
+        steam_id_string = "https://steamcommunity.com/id/gabelogannewell"
+        expected_steam_id_64 = "12345678901234567"
+        mocked_resolve_custom_id.return_value = expected_steam_id_64
+        steam_id = SteamID(steam_id_string)
+        steam_id_64 = await steam_id.to_steam_id_64()
+        mocked_resolve_custom_id.assert_called_with("gabelogannewell")
+        self.assertEqual(expected_steam_id_64, steam_id_64)
+
+    @patch("steamid.steamid.resolve_custom_id")
+    async def test_custom_name(self, mocked_resolve_custom_id: AsyncMock):
+        steam_id_string = "gabelogannewell"
+        expected_steam_id_64 = "12345678901234567"
+        mocked_resolve_custom_id.return_value = expected_steam_id_64
+        steam_id = SteamID(steam_id_string)
+        steam_id_64 = await steam_id.to_steam_id_64()
+        mocked_resolve_custom_id.assert_called_with("gabelogannewell")
         self.assertEqual(expected_steam_id_64, steam_id_64)
 
 

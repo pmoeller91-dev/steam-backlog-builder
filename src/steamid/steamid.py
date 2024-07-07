@@ -1,5 +1,6 @@
 from enum import Enum
 import re
+from .resolve_custom_id import resolve_custom_id
 
 
 class SteamIDType(Enum):
@@ -83,8 +84,10 @@ class SteamID:
         and the result will be cached.
 
         Raises:
-            NotImplementedError: Raised for Custom Name and Custom URL as this
-            is not implemented yet
+            InvalidCustomIDError: Raised if the custom id is not associated with a
+            steam profile.
+            aiohttp.ClientResponseError: Raised if the request made to
+            ``steamcommunity.com`` is not a success status.
 
         Returns:
             str: The Steam ID 64 representation.
@@ -97,6 +100,7 @@ class SteamID:
                 matches = re.match(
                     steam_id_regex[SteamIDType.STEAM_ID], self._steam_id[1]
                 )
+                assert matches is not None
                 y = int(matches.group(2))
                 z = int(matches.group(3))
 
@@ -107,6 +111,7 @@ class SteamID:
                 matches = re.match(
                     steam_id_regex[SteamIDType.STEAM_ID_3], self._steam_id[1]
                 )
+                assert matches is not None
                 w = int(matches.group(2))
                 steam_id_64 = w + steam_id_64_identifier
                 self._steam_id_64 = str(steam_id_64)
@@ -116,10 +121,22 @@ class SteamID:
                 matches = re.match(
                     steam_id_regex[SteamIDType.STANDARD_URL], self._steam_id[1]
                 )
+                assert matches is not None
                 self._steam_id_64 = matches.group(1)
             case SteamIDType.CUSTOM_URL:
-                raise NotImplementedError("Custom URL not implemented")
+                matches = re.match(
+                    steam_id_regex[SteamIDType.CUSTOM_URL], self._steam_id[1]
+                )
+                assert matches is not None
+                steam_id_64 = await resolve_custom_id(matches.group(1))
+                self._steam_id_64 = steam_id_64
             case SteamIDType.CUSTOM_NAME:
-                raise NotImplementedError("Custom name not implemented")
+                matches = re.match(
+                    steam_id_regex[SteamIDType.CUSTOM_NAME], self._steam_id[1]
+                )
+                assert matches is not None
+                steam_id_64 = await resolve_custom_id(matches.group(1))
+                self._steam_id_64 = steam_id_64
 
+        assert self._steam_id_64 is not None
         return self._steam_id_64

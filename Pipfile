@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 typing-extensions = "*"
+aiohttp = {extras = ["speedups"], version = "*"}
+defusedxml = "*"
+aioresponses = "*"
+packaging = "*"
 
 [dev-packages]
 
