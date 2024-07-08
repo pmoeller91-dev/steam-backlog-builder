@@ -47,18 +47,23 @@ async def resolve_custom_id(id: str) -> str:
         try:
             async with session.get(steam_community_id_url(id)) as response:
                 xml_text = await response.text()
-                etree = defusedxml.ElementTree.fromstring(xml_text)
-                steam_id_64_element = etree.find("steamID64")
-                if steam_id_64_element is None:
-                    raise InvalidCustomIDError(
-                        "steamID64 element could not be found in returned XML document"
-                    )
-                if not steam_id_64_element.text:
-                    raise InvalidCustomIDError("steamID64 element was blank")
-                return steam_id_64_element.text
         except aiohttp.ClientResponseError as e:
-            if e.status == 404:
-                raise InvalidCustomIDError(
-                    f"The custom id {id} is not associated with a Steam profile."
-                )
-            raise e
+            raise InvalidCustomIDError(
+                f"An HTTP error was encountered trying to resolve the custom ID: {e.status}"
+            )
+
+        etree = defusedxml.ElementTree.fromstring(xml_text)
+        error = etree.find("error")
+        if error is not None:
+            error_text = error.text or ""
+            raise InvalidCustomIDError(
+                f'An error was encountered trying to resolve the custom ID: "{error_text}"'
+            )
+        steam_id_64_element = etree.find("steamID64")
+        if steam_id_64_element is None:
+            raise InvalidCustomIDError(
+                "steamID64 element could not be found in returned XML document"
+            )
+        if not steam_id_64_element.text:
+            raise InvalidCustomIDError("steamID64 element was blank")
+        return steam_id_64_element.text

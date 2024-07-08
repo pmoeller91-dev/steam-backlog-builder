@@ -9,6 +9,7 @@ aiohttp = {extras = ["speedups"], version = "*"}
 defusedxml = "*"
 aioresponses = "*"
 packaging = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-pipenv run python3 src/main.py
+pipenv -q run python3 src/main.py $@
