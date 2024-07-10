@@ -1,16 +1,12 @@
 from typing import Any, TypedDict
 import aiohttp
 import json
-
+from .error import AuthFailedError
 
 class OwnedGame(TypedDict):
     name: str
     playtime_forever: int
     appid: int
-
-
-class AuthFailedError(Exception):
-    pass
 
 
 async def get_owned_games(steam_id_64: str, steam_api_key: str) -> list[OwnedGame]:

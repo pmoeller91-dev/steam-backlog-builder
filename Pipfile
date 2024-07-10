@@ -5,11 +5,12 @@ name = "pypi"
 
 [packages]
 typing-extensions = "*"
-aiohttp = {extras = ["speedups"], version = "*"}
+aiohttp = {extras = ["speedups"] }
 defusedxml = "*"
 aioresponses = "*"
 packaging = "*"
 python-dotenv = "*"
+jsonschema = "*"
 
 [dev-packages]
 
