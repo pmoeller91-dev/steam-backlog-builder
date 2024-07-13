@@ -11,6 +11,7 @@ aioresponses = "*"
 packaging = "*"
 python-dotenv = "*"
 jsonschema = "*"
+from-root = "*"
 
 [dev-packages]
 
